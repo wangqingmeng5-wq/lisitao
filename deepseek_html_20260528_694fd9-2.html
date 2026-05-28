@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>李思涛 | Li Sitao</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Noto+Sans+SC:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --ink-soft: #3d3d5c;
+    --ink-faint: #8888aa;
+    --paper: #f7f4ef;
+    --paper-warm: #ede8df;
+    --accent: #c0392b;
+    --accent-soft: #e8c5c0;
+    --gold: #b8860b;
+    --gold-light: #f0d080;
+    --line: rgba(26,26,46,0.12);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans SC', 'DM Sans', sans-serif;
+    font-weight: 300;
+    cursor: none;
+    overflow-x: hidden;
+  }
+
+  /* CURSOR */
+  #cursor-dot {
+    position: fixed; top: 0; left: 0; width: 8px; height: 8px;
+    background: var(--accent); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: transform 0.1s;
+  }
+  #cursor-ring {
+    position: fixed; top: 0; left: 0; width: 32px; height: 32px;
+    border: 1.5px solid var(--accent); border-radius: 50%;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%,-50%);
+    transition: all 0.18s ease;
+    opacity: 0.6;
+  }
+  body:hover #cursor-ring { opacity: 1; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 60px;
+    height: 64px;
+    background: rgba(247,244,239,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+  }
+  .nav-links {
+    display: flex; gap: 36px; list-style: none;
+    align-items: center;
+  }
+  .nav-links a {
+    text-decoration: none;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  #lang-toggle {
+    background: var(--ink); color: var(--paper);
+    border: none; padding: 6px 18px;
+    font-size: 0.75rem; letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: none;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+  #lang-toggle:hover { background: var(--accent); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left {
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 120px 60px 80px 60px;
+    position: relative; z-index: 2;
+  }
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.3s forwards;
+  }
+  .hero-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.2rem, 6vw, 5.5rem);
+    line-height: 1.05;
+    font-weight: 700;
+    color: var(--ink);
+    opacity: 0;
+    animation: fadeUp 0.8s 0.5s forwards;
+  }
+  .hero-name em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero-sub {
+    margin-top: 28px;
+    font-size: 1rem;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    max-width: 420px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.7s forwards;
+  }
+  .hero-tags {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    margin-top: 36px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.9s forwards;
+  }
+  .tag {
+    display: inline-block;
+    padding: 5px 14px;
+    border: 1px solid var(--line);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    background: transparent;
+    transition: all 0.2s;
+  }
+  .tag:hover { border-color: var(--accent); color: var(--accent); }
+  .hero-contact {
+    margin-top: 48px;
+    display: flex; flex-direction: column; gap: 8px;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.1s forwards;
+  }
+  .hero-contact span {
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+  }
+  .hero-right {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .hero-right::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--paper-warm) 0%, var(--accent-soft) 100%);
+    opacity: 0.35;
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.5;
+  }
+  .hero-badge {
+    position: relative; z-index: 2;
+    text-align: center;
+    opacity: 0;
+    animation: fadeIn 1.2s 1.2s forwards;
+  }
+  .hero-badge-circle {
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    border: 2px solid rgba(192,57,43,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    background: rgba(247,244,239,0.7);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 60px rgba(192,57,43,0.1);
+    padding: 8px;
+    overflow: hidden;
+  }
+  .hero-badge-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  .hero-badge-school {
+    margin-top: 20px;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .hero-deco {
+    position: absolute;
+    font-family: 'Playfair Display', serif;
+    font-size: 14rem;
+    font-weight: 700;
+    color: var(--accent);
+    opacity: 0.04;
+    user-select: none;
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 100px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.15;
+  }
+  .section-divider {
+    width: 48px; height: 2px;
+    background: var(--accent);
+    margin: 24px 0 48px;
+  }
+
+  /* REVEAL ANIMATION */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* EDUCATION */
+  .edu-block {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 60px;
+    align-items: start;
+  }
+  .edu-meta {
+    border-right: 1px solid var(--line);
+    padding-right: 48px;
+  }
+  .edu-school {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .edu-degree {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .edu-period {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    border: 1px solid var(--accent-soft);
+    display: inline-block;
+    padding: 3px 10px;
+    margin-top: 10px;
+  }
+  .edu-highlights {
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .edu-highlight-item {
+    display: flex; gap: 16px;
+    align-items: flex-start;
+  }
+  .edu-highlight-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+  .edu-highlight-text {
+    font-size: 0.88rem;
+    line-height: 1.75;
+    color: var(--ink-soft);
+  }
+  .edu-highlight-text strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .edu-extra {
+    margin-top: 32px;
+    padding: 20px 24px;
+    background: var(--paper-warm);
+    border-left: 3px solid var(--gold);
+    display: flex; gap: 32px;
+  }
+  .edu-stat { text-align: center; }
+  .edu-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .edu-stat-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin-top: 4px;
+  }
+
+  /* PROJECTS */
+  .projects-wrapper {
+    display: flex; flex-direction: column; gap: 2px;
+    border: 1px solid var(--line);
+  }
+  .project-item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 0;
+    border-bottom: 1px solid var(--line);
+    transition: background 0.2s;
+    cursor: default;
+    overflow: hidden;
+  }
+  .project-item:last-child { border-bottom: none; }
+  .project-item:hover { background: var(--paper-warm); }
+  .project-num {
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 32px 0 32px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--line);
+    font-style: italic;
+    border-right: 1px solid var(--line);
+  }
+  .project-body {
+    padding: 32px 40px;
+  }
+  .project-header {
+    display: flex; align-items: baseline; gap: 16px;
+    margin-bottom: 10px; flex-wrap: wrap;
+  }
+  .project-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .project-org {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    border-left: 2px solid var(--accent-soft);
+    padding-left: 10px;
+  }
+  .project-desc {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: var(--ink-soft);
+    max-width: 640px;
+  }
+  .project-tags {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-top: 16px;
+  }
+  .project-tag {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+  }
+  .project-period {
+    padding: 32px 32px 32px 16px;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+    white-space: nowrap;
+    display: flex; align-items: flex-start;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+
+  /* SKILLS - card only, no bars */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .skill-card {
+    background: var(--paper);
+    padding: 36px 32px;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .skill-card:hover { background: var(--paper-warm); }
+  .skill-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--accent);
+    transition: height 0.4s ease;
+  }
+  .skill-card:hover::before { height: 100%; }
+  .skill-card-icon {
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--accent);
+    opacity: 0.7;
+    line-height: 1;
+  }
+  .skill-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+  .skill-card-desc {
+    font-size: 0.82rem;
+    line-height: 1.8;
+    color: var(--ink-soft);
+  }
+  .skill-card-keywords {
+    margin-top: 16px;
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .skill-keyword {
+    font-size: 0.67rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent-soft);
+    padding: 2px 8px;
+  }
+
+  /* CONTACT */
+  .contact-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .contact-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 32px;
+  }
+  .contact-headline em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .contact-note {
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--ink-soft);
+    max-width: 360px;
+  }
+  .contact-items {
+    display: flex; flex-direction: column; gap: 24px;
+  }
+  .contact-item {
+    display: flex; gap: 20px; align-items: flex-start;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .contact-item:last-child { border-bottom: none; }
+  .contact-item-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    min-width: 60px;
+    margin-top: 2px;
+  }
+  .contact-item-value {
+    font-size: 0.95rem;
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  /* STATS STRIP */
+  .stats-strip {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 60px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    text-align: center;
+  }
+  .stat-item-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+  .stat-item-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(247,244,239,0.5);
+    margin-top: 10px;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 32px 60px;
+    display: flex;
+    align-items: center; justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  footer .foot-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-style: italic;
+    opacity: 0.7;
+  }
+  footer .foot-note {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    opacity: 0.35;
+  }
+
+  /* FULL-WIDTH SECTION BG */
+  .section-full {
+    max-width: 100%;
+    padding: 0;
+  }
+  .section-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 60px;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    nav { padding: 0 24px; }
+    .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-left { padding: 100px 24px 60px; }
+    .hero-right { display: none; }
+    section { padding: 64px 24px; }
+    .edu-block { grid-template-columns: 1fr; gap: 32px; }
+    .edu-meta { border-right: none; padding-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 24px; }
+    .project-item { grid-template-columns: 1fr; }
+    .project-num { display: none; }
+    .project-period { writing-mode: horizontal-tb; }
+    .skills-grid { grid-template-columns: 1fr; }
+    .contact-wrapper { grid-template-columns: 1fr; gap: 40px; }
+    .stats-strip { grid-template-columns: repeat(2, 1fr); padding: 40px 24px; }
+    footer { flex-direction: column; gap: 8px; text-align: center; padding: 24px; }
+    .section-inner { padding: 64px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Li Sitao</div>
+  <ul class="nav-links">
+    <li><a href="#education" data-zh="教育" data-en="Education">教育</a></li>
+    <li><a href="#projects" data-zh="项目" data-en="Projects">项目</a></li>
+    <li><a href="#skills" data-zh="能力" data-en="Skills">能力</a></li>
+    <li><a href="#contact" data-zh="联系" data-en="Contact">联系</a></li>
+    <li><button id="lang-toggle">EN</button></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <p class="hero-eyebrow" data-zh="临床医学生 · 医学 × AI 探索者" data-en="Medical Student · Medicine × AI Explorer">临床医学生 · 医学 × AI 探索者</p>
+    <h1 class="hero-name" data-zh="李<em>思涛</em>" data-en="Li <em>Sitao</em>">李<em>思涛</em></h1>
+    <p class="hero-sub" data-zh="上海交通大学临床医学（英文班）在读，以系统化医学思维融合 AI 评测与数据分析，探索医学与人工智能的交叉边界。" data-en="Clinical Medicine student at Shanghai Jiao Tong University (English-track). Bridging systematic medical thinking with AI evaluation and data analysis at the intersection of medicine and artificial intelligence.">上海交通大学临床医学（英文班）在读，以系统化医学思维融合 AI 评测与数据分析，探索医学与人工智能的交叉边界。</p>
+    <div class="hero-tags">
+      <span class="tag" data-zh="医学 × AI" data-en="Medicine × AI">医学 × AI</span>
+      <span class="tag" data-zh="推理评测" data-en="Reasoning Eval">推理评测</span>
+      <span class="tag" data-zh="数据分析" data-en="Data Analysis">数据分析</span>
+      <span class="tag" data-zh="肿瘤心脏病学" data-en="Cardio-Oncology">肿瘤心脏病学</span>
+      <span class="tag" data-zh="双语学术" data-en="Bilingual Research">双语学术</span>
+    </div>
+    <div class="hero-contact">
+      <span>18320944692</span>
+      <span>3480706190@qq.com</span>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-grid"></div>
+    <div class="hero-deco">M</div>
+    <div class="hero-badge">
+      <div class="hero-badge-circle">
+        <img src="my-photo.jpg" alt="李思涛照片">
+      </div>
+      <div class="hero-badge-school" data-zh="上海交通大学 · 2023—2028" data-en="Shanghai Jiao Tong University · 2023—2028">上海交通大学 · 2023—2028</div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS STRIP -->
+<div class="stats-strip reveal">
+  <div class="stat-item">
+    <div class="stat-item-num">87</div>
+    <div class="stat-item-label" data-zh="核心课程均分 /100" data-en="Core GPA /100">核心课程均分 /100</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-item-num">632</div>
+    <div class="stat-item-label" data-zh="英语四级成绩" data-en="CET-4 Score">英语四级成绩</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-item-num">610</div>
+    <div class="stat-item-label" data-zh="英语六级成绩" data-en="CET-6 Score">英语六级成绩</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-item-num">146</div>
+    <div class="stat-item-label" data-zh="高考数学 /150" data-en="Gaokao Math /150">高考数学 /150</div>
+  </div>
+</div>
+
+<!-- EDUCATION -->
+<section id="education">
+  <p class="section-label reveal" data-zh="01 — 教育背景" data-en="01 — Education">01 — 教育背景</p>
+  <h2 class="section-title reveal" data-zh="学术成长" data-en="Academic Foundation">学术成长</h2>
+  <div class="section-divider reveal"></div>
+  <div class="edu-block reveal">
+    <div class="edu-meta">
+      <div class="edu-school" data-zh="上海交通大学" data-en="Shanghai Jiao Tong University">上海交通大学</div>
+      <div class="edu-degree" data-zh="临床医学 · 本科 · 英文授课班" data-en="Clinical Medicine · B.Sc. · English-Track">临床医学 · 本科 · 英文授课班</div>
+      <div class="edu-period">2023.09 — 2028.06</div>
+      <div style="margin-top:28px;">
+        <div class="edu-extra">
+          <div class="edu-stat">
+            <div class="edu-stat-num">87</div>
+            <div class="edu-stat-label" data-zh="核心均分" data-en="Core Avg.">核心均分</div>
+          </div>
+          <div class="edu-stat">
+            <div class="edu-stat-num">146</div>
+            <div class="edu-stat-label" data-zh="高考数学" data-en="Math Score">高考数学</div>
+          </div>
+          <div class="edu-stat">
+            <div class="edu-stat-num">2024</div>
+            <div class="edu-stat-label" data-zh="渥太华交流" data-en="Ottawa Exchange">渥太华交流</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="edu-highlights">
+      <div class="edu-highlight-item">
+        <div class="edu-highlight-dot"></div>
+        <div class="edu-highlight-text" data-zh="<strong>全英文授课</strong>，采纳北美器官系统整合课程体系，按人体系统模块（Foundation → MSK → 心血管 → 呼吸 → 消化等）组织教学，配套 CBL 案例讨论、PSD 临床技能训练与 SIM 医学人文模块并行推进" data-en="<strong>All-English instruction</strong> following the North American organ-system integrated curriculum, organized by body-system modules (Foundation → MSK → Cardiovascular → Respiratory → GI, etc.), complemented by CBL case discussions, PSD clinical skills training and SIM medical humanities modules">
+          <strong>全英文授课</strong>，采纳北美器官系统整合课程体系，按人体系统模块（Foundation → MSK → 心血管 → 呼吸 → 消化等）组织教学，配套 CBL 案例讨论、PSD 临床技能训练与 SIM 医学人文模块并行推进
+        </div>
+      </div>
+      <div class="edu-highlight-item">
+        <div class="edu-highlight-dot"></div>
+        <div class="edu-highlight-text" data-zh="<strong>2024 年暑期</strong>赴加拿大渥太华大学交流学习，拓展国际学术视野" data-en="<strong>Summer 2024</strong> exchange study at the University of Ottawa, Canada, broadening international academic perspective">
+          <strong>2024 年暑期</strong>赴加拿大渥太华大学交流学习，拓展国际学术视野
+        </div>
+      </div>
+      <div class="edu-highlight-item">
+        <div class="edu-highlight-dot"></div>
+        <div class="edu-highlight-text" data-zh="核心课程：<strong>Human Anatomy、Biochemistry、Cell Biology、Python</strong>，核心课程均分 87/100" data-en="Core courses: <strong>Human Anatomy, Biochemistry, Cell Biology, Python</strong>; Core GPA 87/100">
+          核心课程：<strong>Human Anatomy、Biochemistry、Cell Biology、Python</strong>，核心课程均分 87/100
+        </div>
+      </div>
+      <div class="edu-highlight-item">
+        <div class="edu-highlight-dot"></div>
+        <div class="edu-highlight-text" data-zh="高考数学 <strong>146/150</strong>；获<strong>广东省高中数学联赛二等奖</strong>" data-en="Gaokao Mathematics <strong>146/150</strong>; <strong>Second Prize, Guangdong Provincial High School Mathematics League</strong>">
+          高考数学 <strong>146/150</strong>；获<strong>广东省高中数学联赛二等奖</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<div class="section-full" style="background: var(--paper-warm); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+  <div class="section-inner" id="projects">
+    <p class="section-label reveal" data-zh="02 — 项目经历" data-en="02 — Projects">02 — 项目经历</p>
+    <h2 class="section-title reveal" data-zh="实践探索" data-en="Research & Practice">实践探索</h2>
+    <div class="section-divider reveal"></div>
+    <div class="projects-wrapper reveal">
+
+      <div class="project-item">
+        <div class="project-num">01</div>
+        <div class="project-body">
+          <div class="project-header">
+            <div class="project-title" data-zh="大模型推理评测与数据闭环" data-en="LLM Reasoning Evaluation & Data Flywheel">大模型推理评测与数据闭环</div>
+            <div class="project-org" data-zh="蚂蚁集团 · 推理模型 Ring" data-en="Ant Group · Reasoning Model Ring">蚂蚁集团 · 推理模型 Ring</div>
+          </div>
+          <div class="project-desc" data-zh="参与高阶推理模型 Ring 的验证器训练数据建设，对 IMO/CMO 级别数学题的解答过程进行严格人工审核，识别逻辑漏洞与关键错误。与模型自动生成的 Bug Report 进行逐条一致性比对，判断误召与漏召，参与评测标注标准迭代。在实践中理解如何将专家判断转化为可量化的模型评估指标，推进数据飞轮构建，提升模型推理严谨性；熟悉 LaTeX，能在源码层面定位数学公式与逻辑排版错误。" data-en="Contributed to verifier training data for the advanced reasoning model Ring, rigorously reviewing IMO/CMO-level mathematical solutions to identify logical flaws and critical errors. Performed line-by-line consistency comparisons with auto-generated Bug Reports, judging false positives and negatives. Gained hands-on understanding of translating expert judgment into quantifiable model evaluation metrics, advancing data flywheel construction. Proficient in LaTeX for locating formula and typesetting errors at the source level.">参与高阶推理模型 Ring 的验证器训练数据建设，对 IMO/CMO 级别数学题的解答过程进行严格人工审核，识别逻辑漏洞与关键错误。与模型自动生成的 Bug Report 进行逐条一致性比对，判断误召与漏召，参与评测标注标准迭代。在实践中理解如何将专家判断转化为可量化的模型评估指标，推进数据飞轮构建，提升模型推理严谨性；熟悉 LaTeX，能在源码层面定位数学公式与逻辑排版错误。</div>
+          <div class="project-tags">
+            <span class="project-tag">LLM Eval</span>
+            <span class="project-tag">IMO / CMO</span>
+            <span class="project-tag">Data Flywheel</span>
+            <span class="project-tag">LaTeX</span>
+          </div>
+        </div>
+        <div class="project-period">2025.12 — 2026.03</div>
+      </div>
+
+      <div class="project-item">
+        <div class="project-num">02</div>
+        <div class="project-body">
+          <div class="project-header">
+            <div class="project-title" data-zh="AI 辅助孤独症早期诊断系统" data-en="AI-Assisted Autism Early Diagnosis System">AI 辅助孤独症早期诊断系统</div>
+            <div class="project-org" data-zh="大学生创新训练计划 · 医+X 交叉学科" data-en="Undergraduate Innovation Program · Medicine + X">大学生创新训练计划 · 医+X 交叉学科</div>
+          </div>
+          <div class="project-desc" data-zh="参与设计基于计算机视觉与机器学习的孤独症早期识别方案，系统梳理眼动追踪、面部表情、运动控制等多模态行为特征的医学知识体系。独立调研 YOLO 模型在孤独症儿童面部特征识别中的应用可行性，参与完成 3000+ 字英文学术综述，深入调研 XGBoost、随机森林、CNN 等算法在 ASD 识别中的应用。与致远学院物理系同学协作，负责医学知识与 AI 技术框架的对接，初步搭建图像分析原型框架。获批校级创新奖学金 6000 元。" data-en="Contributed to designing a computer vision and machine learning-based autism early-detection system, systematically reviewing multi-modal behavioral features (eye-tracking, facial expression, motor control). Independently investigated the feasibility of YOLO-based facial feature recognition for autistic children and co-authored a 3,000+ word English academic review covering XGBoost, Random Forest, and CNN applications in ASD detection. Collaborated with Physics students at Zhiyuan College to bridge medical knowledge with AI frameworks. Awarded a university-level innovation scholarship of 6,000 RMB.">参与设计基于计算机视觉与机器学习的孤独症早期识别方案，系统梳理眼动追踪、面部表情、运动控制等多模态行为特征的医学知识体系。独立调研 YOLO 模型在孤独症儿童面部特征识别中的应用可行性，参与完成 3000+ 字英文学术综述，深入调研 XGBoost、随机森林、CNN 等算法在 ASD 识别中的应用。与致远学院物理系同学协作，负责医学知识与 AI 技术框架的对接，初步搭建图像分析原型框架。获批校级创新奖学金 6000 元。</div>
+          <div class="project-tags">
+            <span class="project-tag">YOLO</span>
+            <span class="project-tag">XGBoost</span>
+            <span class="project-tag">ASD Detection</span>
+            <span class="project-tag" data-zh="校级奖学金" data-en="Innovation Award">校级奖学金</span>
+          </div>
+        </div>
+        <div class="project-period">2025.06 — 2025.09</div>
+      </div>
+
+      <div class="project-item">
+        <div class="project-num">03</div>
+        <div class="project-body">
+          <div class="project-header">
+            <div class="project-title" data-zh="免疫检查点治疗后心血管风险评估" data-en="Cardiovascular Risk Post Immune Checkpoint Therapy">免疫检查点治疗后心血管风险评估</div>
+            <div class="project-org" data-zh="仁济医院心内科 · 长江学者卜军副院长团队" data-en="Renji Hospital Cardiology · Prof. Bu Jun's Lab">仁济医院心内科 · 长江学者卜军副院长团队</div>
+          </div>
+          <div class="project-desc" data-zh="在国家杰出青年基金获得者、长江学者特聘教授卜军副院长团队指导下，参与肿瘤心脏病学交叉领域研究。精读免疫检查点抑制剂相关心血管事件的前沿文献，完成关键论文的架构梳理与 R 语言代码复现。提出利用新型分子活性评分系统（反映节食相关分子通路活性）评估癌症患者免疫治疗后心血管风险的思路，探索从分子标志物维度优化临床决策的可行路径。" data-en="Conducted research in cardio-oncology under the mentorship of Prof. Bu Jun (NSFC Distinguished Young Scholar, Yangtze River Scholar) at Renji Hospital. Performed in-depth review of frontier literature on immune checkpoint inhibitor-related cardiovascular events and reproduced key R-language analyses. Proposed using a novel molecular activity scoring system (reflecting caloric restriction-related pathway activity) to assess post-immunotherapy cardiovascular risk, exploring optimization of clinical decisions from a molecular biomarker perspective.">在国家杰出青年基金获得者、长江学者特聘教授卜军副院长团队指导下，参与肿瘤心脏病学交叉领域研究。精读免疫检查点抑制剂相关心血管事件的前沿文献，完成关键论文的架构梳理与 R 语言代码复现。提出利用新型分子活性评分系统（反映节食相关分子通路活性）评估癌症患者免疫治疗后心血管风险的思路，探索从分子标志物维度优化临床决策的可行路径。</div>
+          <div class="project-tags">
+            <span class="project-tag">Cardio-Oncology</span>
+            <span class="project-tag">ICI</span>
+            <span class="project-tag">R Language</span>
+            <span class="project-tag" data-zh="文献研究" data-en="Literature Review">文献研究</span>
+          </div>
+        </div>
+        <div class="project-period">2024.08 — 2024.11</div>
+      </div>
+
+      <div class="project-item">
+        <div class="project-num">04</div>
+        <div class="project-body">
+          <div class="project-header">
+            <div class="project-title" data-zh="华东地区良性食管病数据库建设" data-en="East China Benign Esophageal Disease Database">华东地区良性食管病数据库建设</div>
+            <div class="project-org" data-zh="上海交通大学暑期社会实践 · 数据分析与统计" data-en="SJTU Summer Research Practice · Data Analysis">上海交通大学暑期社会实践 · 数据分析与统计</div>
+          </div>
+          <div class="project-desc" data-zh="参与前瞻性收集华东地区良性食管病患者的多维度数据，使用 SPSS 对数据进行质量控制和描述性统计分析，初步探索不同食管病类型（胃食管反流、食管裂孔疝、贲门失弛缓症等）的临床表现差异。协助构建良性食管病数据库，为临床医生提供数据参考并辅助后续研究。" data-en="Prospectively collected multi-dimensional clinical data from East China benign esophageal disease patients. Applied SPSS for data quality control and descriptive statistical analysis, exploring clinical presentation differences across disease types (GERD, hiatal hernia, achalasia, etc.). Assisted in constructing the benign esophageal disease database to support clinical reference and further research.">参与前瞻性收集华东地区良性食管病患者的多维度数据，使用 SPSS 对数据进行质量控制和描述性统计分析，初步探索不同食管病类型（胃食管反流、食管裂孔疝、贲门失弛缓症等）的临床表现差异。协助构建良性食管病数据库，为临床医生提供数据参考并辅助后续研究。</div>
+          <div class="project-tags">
+            <span class="project-tag">SPSS</span>
+            <span class="project-tag" data-zh="数据库建设" data-en="Database Build">数据库建设</span>
+            <span class="project-tag" data-zh="描述性统计" data-en="Descriptive Stats">描述性统计</span>
+          </div>
+        </div>
+        <div class="project-period">2024.06 — 2024.09</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <p class="section-label reveal" data-zh="03 — 能力与视野" data-en="03 — Competencies">03 — 能力与视野</p>
+  <h2 class="section-title reveal" data-zh="我能带来什么" data-en="What I Bring">我能带来什么</h2>
+  <div class="section-divider reveal"></div>
+  <div class="skills-grid reveal">
+
+    <div class="skill-card">
+      <span class="skill-card-icon">I</span>
+      <div class="skill-card-title" data-zh="医学知识与系统思维" data-en="Medical Knowledge & Systems Thinking">医学知识与系统思维</div>
+      <div class="skill-card-desc" data-zh="临床医学英文班（北美器官系统整合课程），以系统化视角拆解复杂问题，能将医学知识抽象为结构化产品需求与评测维度。" data-en="Trained in the North American organ-system integrated curriculum (English-track). Able to deconstruct complex problems systematically and abstract medical knowledge into structured product requirements and evaluation dimensions.">临床医学英文班（北美器官系统整合课程），以系统化视角拆解复杂问题，能将医学知识抽象为结构化产品需求与评测维度。</div>
+      <div class="skill-card-keywords">
+        <span class="skill-keyword">CBL</span>
+        <span class="skill-keyword" data-zh="器官系统" data-en="Organ Systems">器官系统</span>
+        <span class="skill-keyword" data-zh="结构化思维" data-en="Structured Thinking">结构化思维</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <span class="skill-card-icon">II</span>
+      <div class="skill-card-title" data-zh="AI 评测与数据闭环" data-en="AI Evaluation & Data Flywheel">AI 评测与数据闭环</div>
+      <div class="skill-card-desc" data-zh="在蚂蚁集团推理模型 Ring 项目中，实践了从专家判断到可量化评估指标的转化过程，理解数据飞轮构建逻辑，熟悉 LaTeX 源码层面的文本定位与纠错。" data-en="In Ant Group's Ring project, translated expert judgment into quantifiable model evaluation metrics. Deep understanding of data flywheel construction logic; proficient in LaTeX for source-level text localization and error correction.">在蚂蚁集团推理模型 Ring 项目中，实践了从专家判断到可量化评估指标的转化过程，理解数据飞轮构建逻辑，熟悉 LaTeX 源码层面的文本定位与纠错。</div>
+      <div class="skill-card-keywords">
+        <span class="skill-keyword">LLM Eval</span>
+        <span class="skill-keyword">LaTeX</span>
+        <span class="skill-keyword" data-zh="数据飞轮" data-en="Data Flywheel">数据飞轮</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <span class="skill-card-icon">III</span>
+      <div class="skill-card-title" data-zh="数据分析与技术工具" data-en="Data Analysis & Technical Tools">数据分析与技术工具</div>
+      <div class="skill-card-desc" data-zh="熟练使用 Python、R、SPSS 进行数据处理与统计分析；具备 Prompt Engineering 经验；能无障碍阅读 AI/医学领域前沿论文与技术博客。" data-en="Proficient in Python, R, and SPSS for data processing and statistical analysis. Experienced in Prompt Engineering. Capable of reading frontier AI and medical papers and technical blogs without difficulty.">熟练使用 Python、R、SPSS 进行数据处理与统计分析；具备 Prompt Engineering 经验；能无障碍阅读 AI/医学领域前沿论文与技术博客。</div>
+      <div class="skill-card-keywords">
+        <span class="skill-keyword">Python</span>
+        <span class="skill-keyword">R</span>
+        <span class="skill-keyword">SPSS</span>
+        <span class="skill-keyword">Prompt Eng.</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <span class="skill-card-icon">IV</span>
+      <div class="skill-card-title" data-zh="语言能力" data-en="Language Proficiency">语言能力</div>
+      <div class="skill-card-desc" data-zh="英语流利（全英文授课 + 加拿大暑研经历），英语四级 632 / 六级 610，能独立撰写英文学术综述与项目文档，英文可作为工作语言。" data-en="Fluent English (all-English coursework + Canadian research experience). CET-4: 632 / CET-6: 610. Independently authors English academic reviews and project documentation. English serves as a working language.">英语流利（全英文授课 + 加拿大暑研经历），英语四级 632 / 六级 610，能独立撰写英文学术综述与项目文档，英文可作为工作语言。</div>
+      <div class="skill-card-keywords">
+        <span class="skill-keyword">CET-4: 632</span>
+        <span class="skill-keyword">CET-6: 610</span>
+        <span class="skill-keyword" data-zh="学术写作" data-en="Academic Writing">学术写作</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <span class="skill-card-icon">V</span>
+      <div class="skill-card-title" data-zh="跨学科协作" data-en="Interdisciplinary Collaboration">跨学科协作</div>
+      <div class="skill-card-desc" data-zh="与物理系、AI 工程师、临床医生等不同背景的人高效协作，擅长在医学知识与技术框架之间搭建沟通桥梁，推进交叉学科项目落地。" data-en="Effectively collaborates across Physics, AI engineering, and clinical medicine backgrounds. Skilled at building communication bridges between medical knowledge and technical frameworks to advance interdisciplinary projects.">与物理系、AI 工程师、临床医生等不同背景的人高效协作，擅长在医学知识与技术框架之间搭建沟通桥梁，推进交叉学科项目落地。</div>
+      <div class="skill-card-keywords">
+        <span class="skill-keyword" data-zh="医学 × AI" data-en="Medicine × AI">医学 × AI</span>
+        <span class="skill-keyword" data-zh="跨学科" data-en="Interdisciplinary">跨学科</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <span class="skill-card-icon">VI</span>
+      <div class="skill-card-title" data-zh="学术研究能力" data-en="Academic Research">学术研究能力</div>
+      <div class="skill-card-desc" data-zh="具备独立文献调研与综述撰写能力，参与多项临床与 AI 交叉研究；高考数学 146 分、广东省数学联赛二等奖体现扎实的数理基础。" data-en="Independently conducts literature reviews and academic writing, with participation in multiple clinical-AI cross-disciplinary studies. Strong mathematical foundation evidenced by Gaokao Math 146/150 and Guangdong Provincial Mathematics League Second Prize.">具备独立文献调研与综述撰写能力，参与多项临床与 AI 交叉研究；高考数学 146 分、广东省数学联赛二等奖体现扎实的数理基础。</div>
+      <div class="skill-card-keywords">
+        <span class="skill-keyword" data-zh="文献综述" data-en="Lit. Review">文献综述</span>
+        <span class="skill-keyword" data-zh="数理基础" data-en="Math Foundation">数理基础</span>
+        <span class="skill-keyword" data-zh="省级奖项" data-en="Provincial Award">省级奖项</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTACT -->
+<div class="section-full" style="background: var(--ink);">
+  <div class="section-inner" id="contact">
+    <div class="contact-wrapper">
+      <div>
+        <h2 class="contact-headline reveal" style="color:var(--paper);" data-zh="期待与你<em>连接</em>" data-en="Let's <em>Connect</em>">期待与你<em>连接</em></h2>
+        <p class="contact-note reveal" style="color:rgba(247,244,239,0.55);" data-zh="无论是医学 × AI 的交叉探索、数据分析合作，还是学术交流，欢迎随时联系。" data-en="Whether it's Medicine × AI exploration, data analysis collaboration, or academic exchange — feel free to reach out anytime.">无论是医学 × AI 的交叉探索、数据分析合作，还是学术交流，欢迎随时联系。</p>
+      </div>
+      <div class="contact-items reveal">
+        <div class="contact-item" style="border-bottom-color:rgba(255,255,255,0.1);">
+          <div class="contact-item-label" style="color:rgba(247,244,239,0.35);" data-zh="电话" data-en="Phone">电话</div>
+          <div class="contact-item-value" style="color:var(--paper);">18320944692</div>
+        </div>
+        <div class="contact-item" style="border-bottom-color:rgba(255,255,255,0.1);">
+          <div class="contact-item-label" style="color:rgba(247,244,239,0.35);" data-zh="邮箱" data-en="Email">邮箱</div>
+          <div class="contact-item-value" style="color:var(--paper);">3480706190@qq.com</div>
+        </div>
+        <div class="contact-item" style="border-bottom-color:rgba(255,255,255,0.1);">
+          <div class="contact-item-label" style="color:rgba(247,244,239,0.35);" data-zh="院校" data-en="Institution">院校</div>
+          <div class="contact-item-value" style="color:var(--paper);" data-zh="上海交通大学" data-en="Shanghai Jiao Tong University">上海交通大学</div>
+        </div>
+        <div class="contact-item" style="border-bottom-color:transparent;">
+          <div class="contact-item-label" style="color:rgba(247,244,239,0.35);" data-zh="年级" data-en="Year">年级</div>
+          <div class="contact-item-value" style="color:var(--paper);" data-zh="大二 · 2023 级" data-en="Sophomore · Class of 2023">大二 · 2023 级</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="foot-name">Li Sitao · 李思涛</div>
+  <div class="foot-note" data-zh="上海交通大学 · 临床医学 · 2023—2028" data-en="Shanghai Jiao Tong University · Clinical Medicine · 2023—2028">上海交通大学 · 临床医学 · 2023—2028</div>
+</footer>
+
+<script>
+  // CURSOR
+  const dot = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animCursor() {
+    dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+  document.querySelectorAll('a, button, .project-item, .skill-card, .tag').forEach(el => {
+    el.addEventListener('mouseenter', () => { ring.style.transform = 'translate(-50%,-50%) scale(1.8)'; ring.style.borderColor = 'var(--accent)'; });
+    el.addEventListener('mouseleave', () => { ring.style.transform = 'translate(-50%,-50%) scale(1)'; ring.style.borderColor = 'var(--accent)'; });
+  });
+
+  // SCROLL REVEAL
+  const revealEls = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => obs.observe(el));
+
+  // LANGUAGE TOGGLE
+  let isEn = false;
+  const toggle = document.getElementById('lang-toggle');
+
+  function applyLang(en) {
+    document.querySelectorAll('[data-zh][data-en]').forEach(el => {
+      const val = en ? el.getAttribute('data-en') : el.getAttribute('data-zh');
+      if (val !== null) el.innerHTML = val;
+    });
+    toggle.textContent = en ? 'CN' : 'EN';
+    document.documentElement.lang = en ? 'en' : 'zh';
+  }
+
+  toggle.addEventListener('click', () => {
+    isEn = !isEn;
+    applyLang(isEn);
+  });
+</script>
+</body>
+</html>
